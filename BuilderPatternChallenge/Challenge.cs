@@ -4,6 +4,7 @@
 // O código atual usa construtores enormes ou muitos setters, tornando difícil criar relatórios
 
 using DesignPatternChallenge.Models;
+using DesignPatternChallenge.Builders.SalesReports;
 
 namespace DesignPatternChallenge
 {
@@ -18,71 +19,67 @@ namespace DesignPatternChallenge
         {
             Console.WriteLine("=== Sistema de Relatórios ===");
 
-            // Problema 1: Construtor com muitos parâmetros - difícil de ler e usar
-            var report1 = new SalesReport(
-                "Vendas Mensais",           // title
-                "PDF",                       // format
-                new DateTime(2024, 1, 1),   // startDate
-                new DateTime(2024, 1, 31),  // endDate
-                true,                        // includeHeader
-                true,                        // includeFooter
-                "Relatório de Vendas",      // headerText
-                "Confidencial",              // footerText
-                true,                        // includeCharts
-                "Bar",                       // chartType
-                true,                        // includeSummary
-                new List<string> { "Produto", "Quantidade", "Valor" },  // columns
-                new List<string> { "Status=Ativo" },  // filters
-                "Valor",                     // sortBy
-                "Categoria",                 // groupBy
-                true,                        // includeTotals
-                "Portrait",                  // orientation
-                "A4",                        // pageSize
-                true,                        // includePageNumbers
-                "logo.png",                  // companyLogo
-                "Confidencial"               // waterMark
-            );
-
+            // Solução 1: Builder Pattern - Fluent interface, mais legível e flexível
+            var builder1 = new PdfReportBuilder();
+            builder1.SetTitle("Vendas Mensais");
+            builder1.SetFormat();
+            builder1.SetStartDate(new DateTime(2024, 1, 1));
+            builder1.SetEndDate(new DateTime(2024, 1, 31));
+            builder1.HasHeader();
+            builder1.SetHeaderText("Relatório de Vendas");
+            builder1.HasFooter();
+            builder1.SetFooterText("Confidencial");
+            builder1.HasCharts();
+            builder1.SetChartType("Bar");
+            builder1.HasSummary();
+            builder1.SetColumns(new List<string> { "Produto", "Quantidade", "Valor" });
+            builder1.SetFilters(new List<string> { "Status=Ativo" });
+            builder1.SetSortBy("Valor");
+            builder1.SetGroupBy("Categoria");
+            builder1.HasTotals();
+            builder1.SetOrientation("Portrait");
+            builder1.SetPageSize("A4");
+            builder1.HasPageNumbers();
+            builder1.SetCompanyLogo("logo.png");
+            builder1.SetWaterMark("Confidencial");
+            
+            var report1 = builder1.Build();
             report1.Generate();
 
-            // Problema 2: Muitos setters - ordem não importa, pode esquecer configurações obrigatórias
-            var report2 = new SalesReport();
-            report2.Title = "Relatório Trimestral";
-            report2.Format = "Excel";
-            report2.StartDate = new DateTime(2024, 1, 1);
-            report2.EndDate = new DateTime(2024, 3, 31);
-            report2.Columns.Add("Vendedor");
-            report2.Columns.Add("Região");
-            report2.Columns.Add("Total");
-            report2.IncludeCharts = true;
-            report2.ChartType = "Line";
-            // Esqueci de configurar algo? O código compila mas pode falhar em runtime
-            report2.IncludeHeader = true;
-            // Esqueci o HeaderText? 
-            report2.GroupBy = "Região";
-            report2.IncludeTotals = true;
-
+            // Solução 2: Builder Pattern - Ordem clara, todas as configurações em um lugar
+            var builder2 = new ExcelReportBuilder();
+            builder2.SetTitle("Relatório Trimestral");
+            builder2.SetFormat();
+            builder2.SetStartDate(new DateTime(2024, 1, 1));
+            builder2.SetEndDate(new DateTime(2024, 3, 31));
+            builder2.SetColumns(new List<string> { "Vendedor", "Região", "Total" });
+            builder2.HasCharts();
+            builder2.SetChartType("Line");
+            builder2.HasHeader();
+            builder2.SetGroupBy("Região");
+            builder2.HasTotals();
+            
+            var report2 = builder2.Build();
             report2.Generate();
 
-            // Problema 3: Relatórios com configurações parecidas exigem repetir muito código
-            var report3 = new SalesReport();
-            report3.Title = "Vendas Anuais";
-            report3.Format = "PDF";
-            report3.StartDate = new DateTime(2024, 1, 1);
-            report3.EndDate = new DateTime(2024, 12, 31);
-            report3.IncludeHeader = true;
-            report3.HeaderText = "Relatório de Vendas";
-            report3.IncludeFooter = true;
-            report3.FooterText = "Confidencial";
-            report3.Columns.Add("Produto");
-            report3.Columns.Add("Quantidade");
-            report3.Columns.Add("Valor");
-            report3.IncludeCharts = true;
-            report3.ChartType = "Pie";
-            report3.IncludeTotals = true;
-            report3.Orientation = "Landscape";
-            report3.PageSize = "A4";
+            // Solução 3: Builder Pattern - Reutilizando padrões comuns entre relatórios
+            var builder3 = new HtmlReportBuilder();
+            builder3.SetTitle("Vendas Anuais");
+            builder3.SetFormat();
+            builder3.SetStartDate(new DateTime(2024, 1, 1));
+            builder3.SetEndDate(new DateTime(2024, 12, 31));
+            builder3.HasHeader();
+            builder3.SetHeaderText("Relatório de Vendas");
+            builder3.HasFooter();
+            builder3.SetFooterText("Confidencial");
+            builder3.SetColumns(new List<string> { "Produto", "Quantidade", "Valor" });
+            builder3.HasCharts();
+            builder3.SetChartType("Pie");
+            builder3.HasTotals();
+            builder3.SetOrientation("Landscape");
+            builder3.SetPageSize("A4");
 
+            var report3 = builder3.Build();
             report3.Generate();
 
             // Perguntas para reflexão:
